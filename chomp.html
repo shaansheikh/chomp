@@ -1,0 +1,164 @@
+
+<HEAD>
+<Title>Chomp</title>
+
+<SCRIPT LANGUAGE="JavaScript">
+var blank = "blank.gif";
+var brown = "brown.jpeg";
+var poison = "poison.jpeg";
+
+var c=7;                //c = # columns.  Require 6 <= c <= 10.
+var x,y;
+var 
+ppos=[1,12,23,34,45,56,113,122,224,235,246,336,355,1114,1125,1133,1222,2226,2255,2335];
+    //perfect play for c=7 is achieved by adding 
+    //67,257,347,477,2237,2357,2447,3377,3457,4557 to ppos. 
+    //but ppos must be arranged in increasing order. 
+    //For c=8, add 78,268,448,2248,2368,2458,2588,3338.
+var n = [];
+var box = [];
+
+for (var i=1;i<=4;i++) {
+    box[i]=[];
+}
+
+function yourChoice(u,v) {
+    if (box[u][v]==1) {
+        Move(u,v);
+	encode();
+	if (n[1]+n[2]==1) {
+	    alert("Good work!\n You won!");
+	    return;
+	}
+	x=findMove();
+	Move(x,y+1);
+	if (box[1][2]+box[2][1]==0) alert("Nice try,\n but I won!");
+    }    
+}
+
+function Move(x,y) {
+    for (var k1=x;k1<=4;k1++) {
+	for (var k2=y;k2<=c;k2++) {
+            document.images[(4-k1)*c+k2-1].src=blank;
+	    box[k1][k2]=0;
+        }
+    }
+}
+
+function encode() {               //maps position into n[1],n[2],n[3],n[4]
+    for (var i=1;i<5;i++) {
+        n[i]=0;
+	for (var j=1;j<=c;j++) {
+	    n[i]=n[i]+box[i][j];
+	}
+    }
+    n[1]=n[1]+1;
+}
+
+function findMove() {
+    var t=10
+    var k=ppos.length-1;
+    for (y=n[1]-1;y>=n[2];y--) {
+        val=y+t*(n[2]+t*(n[3]+t*n[4]));
+	while (val<ppos[k]) k--;
+	if (val==ppos[k]) {return 1};
+    }
+    for (y=n[2]-1;y>=n[3];y--) {
+        val=n[1]+t*(y+t*(n[3]+t*n[4]));
+	while (val<ppos[k]) k--;
+	if (val==ppos[k]) {return 2};
+        val=y+t*(y+t*(n[3]+t*n[4]));
+	while (val<ppos[k]) k--;
+	if (val==ppos[k]) {return 1};
+    }
+    for (y=n[3]-1;y>=n[4];y--) {
+        val=n[1]+t*(n[2]+t*(y+t*n[4]));
+	while (val<ppos[k]) k--;
+	if (val==ppos[k]) {return 3};
+        val=n[1]+t*(y+t*(y+t*n[4]));
+	while (val<ppos[k]) k--;
+	if (val==ppos[k]) {return 2};
+        val=y+t*(y+t*(y+t*n[4]));
+	while (val<ppos[k]) k--;
+	if (val==ppos[k]) {return 1};
+    }
+    for (y=n[4]-1;y>=0;y--) {
+        val=n[1]+t*(n[2]+t*(n[3]+t*y));
+	while (val<ppos[k]) k--;
+	if (val==ppos[k]) {return 4};
+        val=n[1]+t*(n[2]+t*(y+t*y));
+	while (val<ppos[k]) k--;
+	if (val==ppos[k]) {return 3};
+        val=n[1]+t*(y+t*(y+t*y));
+	while (val<ppos[k]) k--;
+	if (val==ppos[k]) {return 2};
+        val=y+t*(y+t*(y+t*y));
+	while (val<ppos[k]) k--;
+	if (val==ppos[k]) {return 1};
+    }
+   if ((Math.random()>.4) && (n[4]>0)) {
+       y=n[4]-1;
+       return 4;
+   } else if ((Math.random()>.5) && (n[3]>0)) {
+       y=n[3]-1;
+       return 3;
+   } else if ((Math.random()>.67) && (n[2]>0)) {
+       y=n[2]-1;
+       return 2;
+   } else {
+       y=n[1]-1;
+       return 1;
+   }
+}
+
+function playAgain() {
+    for (var i=4;i>0;i--) {
+	for (var j=1;j<=c;j++) {
+	    document.images[c*(i-1)+j-1].src= brown;
+	    box[i][j]=1
+	}
+    }
+    document.images[c*3].src= poison;
+    box[1][1]=0;
+}
+
+</script>
+</HEAD>
+
+<BODY>
+
+<center>
+<hr size=5>
+<h1>CHOMP!</h1>
+<i>JavaScript</i>
+<hr size=5>
+The game of Chomp is like Russian Roulette for chocolate lovers.<br>A move 
+consists of chomping a square out of the chocolate bar<br>along with any 
+squares to the right and above.<br>Players alternate moves.<p>
+
+The lower left square is poisoned though and the player forced to chomp 
+it loses.<p>
+
+Try your luck against the machine.<br>You chomp on a square by clicking on 
+the square with the mouse.<br>You move first.  You can win from the initial 
+position, but be careful!
+
+<SCRIPT LANGUAGE="JavaScript">
+
+document.write("<form name=game><table border=1 cellpadding=0 cellspacing=0><tr>");
+for (var i=4;i>0;i--) {
+    for (var j=1;j<=c;j++) {
+        document.write('<td><a href="javascript:yourChoice('+i+','+j+')">'
+        +'<img src="brown.jpeg" border=0 height=40 width=40></a></td>');
+    }
+    document.write("</tr><tr>");
+}
+document.write("</tr></table>");
+document.write("<input type=button value='New Game' onClick='playAgain();'>");
+document.write("</form><p>");
+playAgain();
+
+</script>
+
+</body>
+</html>
